@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import ProductCard from './ProductCard'
 import ProductFilter from './ProductFilter'
-import s from './mainPage.module.scss'
+import styles from './productList.module.scss'
 
-const MainPage = ({ onAddToCart }) => {
+const ProductList = ({ onAddToCart }) => {
 	const initialProducts = [
 		{
 			id: 1,
@@ -29,6 +29,22 @@ const MainPage = ({ onAddToCart }) => {
 			thumbnail:
 				'https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg',
 		},
+		{
+			id: 4,
+			name: 'Грин Карри',
+			price: 350,
+			category: 'карри',
+			thumbnail:
+				'https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg',
+		},
+		{
+			id: 5,
+			name: 'Спринг Роллы',
+			price: 280,
+			category: 'закуски',
+			thumbnail:
+				'https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg',
+		},
 	]
 
 	const [products] = useState(initialProducts)
@@ -48,14 +64,14 @@ const MainPage = ({ onAddToCart }) => {
 	}
 
 	return (
-		<div className={s.mainPage}>
+		<div className={styles.container}>
 			<ProductFilter
 				filters={filters}
 				activeFilter={activeFilter}
 				onFilterChange={setActiveFilter}
 			/>
 
-			<div className={s.productsGrid}>
+			<div className={styles.productsGrid}>
 				{filteredProducts.map(product => (
 					<ProductCard
 						key={product.id}
@@ -68,4 +84,4 @@ const MainPage = ({ onAddToCart }) => {
 	)
 }
 
-export default MainPage
+export default ProductList

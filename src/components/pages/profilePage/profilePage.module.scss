@@ -1,0 +1,227 @@
+.profilePage {
+	min-height: 70vh;
+	background: #f8f9fa;
+	padding: 40px 0;
+}
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+.title {
+	font-size: 32px;
+	font-weight: 700;
+	color: #333;
+	margin-bottom: 30px;
+	text-align: center;
+}
+
+.profileContent {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 40px;
+}
+
+.profileInfo,
+.ordersHistory {
+	background: white;
+	padding: 30px;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profileInfo h2,
+.ordersHistory h2 {
+	margin: 0 0 20px 0;
+	font-size: 24px;
+	color: #333;
+}
+
+.infoItem {
+	margin-bottom: 15px;
+	font-size: 16px;
+
+	strong {
+		color: #333;
+		margin-right: 10px;
+	}
+}
+
+.editBtn {
+	padding: 10px 20px;
+	background: #ff6b35;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 14px;
+	cursor: pointer;
+	margin-top: 15px;
+
+	&:hover {
+		background: #e55a2b;
+	}
+}
+
+.formGroup {
+	margin-bottom: 15px;
+
+	label {
+		display: block;
+		margin-bottom: 5px;
+		font-weight: 600;
+		color: #333;
+	}
+
+	input {
+		width: 100%;
+		padding: 10px;
+		border: 2px solid #e0e0e0;
+		border-radius: 6px;
+		font-size: 14px;
+
+		&:focus {
+			outline: none;
+			border-color: #ff6b35;
+		}
+	}
+}
+
+.editActions {
+	display: flex;
+	gap: 10px;
+	margin-top: 20px;
+}
+
+.saveBtn {
+	padding: 10px 20px;
+	background: #28a745;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+
+	&:hover {
+		background: #218838;
+	}
+}
+
+.cancelBtn {
+	padding: 10px 20px;
+	background: #6c757d;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+
+	&:hover {
+		background: #545b62;
+	}
+}
+
+.ordersList {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.orderItem {
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 15px;
+}
+
+.orderHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+}
+
+.orderDate {
+	font-weight: 600;
+	color: #333;
+}
+
+.orderStatus {
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 600;
+
+	&.completed {
+		background: #d4edda;
+		color: #155724;
+	}
+
+	&.delivered {
+		background: #d1ecf1;
+		color: #0c5460;
+	}
+}
+
+.orderDetails {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	font-size: 14px;
+	color: #666;
+}
+
+.loading {
+	text-align: center;
+	padding: 40px;
+	font-size: 18px;
+	color: #666;
+}
+
+@media (max-width: 768px) {
+	.profileContent {
+		grid-template-columns: 1fr;
+		gap: 20px;
+	}
+
+	.profileInfo,
+	.ordersHistory {
+		padding: 20px;
+	}
+}
+// Добавляем в существующие стили
+.errorMessage {
+	background: #f8d7da;
+	color: #721c24;
+	padding: 10px 15px;
+	border-radius: 6px;
+	margin-bottom: 20px;
+	border: 1px solid #f5c6cb;
+}
+
+.noOrders {
+	text-align: center;
+	color: #666;
+	font-style: italic;
+	padding: 20px;
+}
+
+.orderType {
+	font-weight: 600;
+	color: #333;
+	margin-bottom: 5px;
+}
+
+.orderTotal {
+	margin-bottom: 5px;
+}
+
+.orderItems {
+	margin-bottom: 5px;
+	font-size: 14px;
+}
+
+.orderAddress,
+.orderPickup {
+	font-size: 14px;
+	color: #666;
+	margin-top: 5px;
+}

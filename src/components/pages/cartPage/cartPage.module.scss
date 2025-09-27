@@ -1,0 +1,314 @@
+.cartPage {
+	min-height: 70vh;
+	padding: 40px 0;
+}
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+.title {
+	font-size: 32px;
+	font-weight: 700;
+	color: #333;
+	margin-bottom: 30px;
+	text-align: center;
+}
+
+.emptyCart {
+	text-align: center;
+	padding: 60px 20px;
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.emptyCartIcon {
+	font-size: 80px;
+	margin-bottom: 20px;
+}
+
+.emptyCart h2 {
+	font-size: 24px;
+	color: #333;
+	margin-bottom: 10px;
+}
+
+.emptyCart p {
+	font-size: 16px;
+	color: #666;
+	margin-bottom: 30px;
+}
+
+.continueShopping {
+	display: inline-block;
+	padding: 12px 24px;
+	background: #ff6b35;
+	color: white;
+	text-decoration: none;
+	border-radius: 8px;
+	font-weight: 600;
+	transition: background 0.2s ease;
+
+	&:hover {
+		background: #e55a2b;
+	}
+}
+
+.cartContent {
+	display: grid;
+	grid-template-columns: 1fr 400px;
+	gap: 40px;
+	align-items: start;
+}
+
+.itemsList {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.cartItem {
+	display: grid;
+	grid-template-columns: 80px 1fr auto;
+	gap: 20px;
+	background: white;
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	align-items: start;
+}
+
+.itemImage {
+	width: 80px;
+	height: 80px;
+	border-radius: 8px;
+	overflow: hidden;
+
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+
+.itemInfo {
+	flex: 1;
+}
+
+.itemName {
+	font-size: 18px;
+	font-weight: 600;
+	color: #333;
+	margin: 0 0 8px 0;
+}
+
+.itemPrice {
+	font-size: 18px;
+	font-weight: 700;
+	color: #ff6b35;
+}
+
+.itemControls {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 15px;
+}
+
+.quantityControls {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.quantityBtn {
+	width: 32px;
+	height: 32px;
+	border: 2px solid #ff6b35;
+	background: white;
+	color: #ff6b35;
+	border-radius: 50%;
+	font-size: 16px;
+	font-weight: bold;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: all 0.2s ease;
+
+	&:hover:not(:disabled) {
+		background: #ff6b35;
+		color: white;
+	}
+
+	&:disabled {
+		border-color: #ccc;
+		color: #ccc;
+		cursor: not-allowed;
+	}
+}
+
+.quantity {
+	font-size: 16px;
+	font-weight: 600;
+	color: #333;
+	min-width: 40px;
+	text-align: center;
+}
+
+.removeBtn {
+	background: none;
+	border: 1px solid #dc3545;
+	color: #dc3545;
+	padding: 6px 12px;
+	border-radius: 6px;
+	font-size: 14px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+
+	&:hover {
+		background: #dc3545;
+		color: white;
+	}
+}
+
+.orderSummary {
+	background: white;
+	padding: 25px;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	position: sticky;
+	top: 20px;
+}
+
+.totalSection {
+	border-top: 1px solid #e0e0e0;
+	border-bottom: 1px solid #e0e0e0;
+	padding: 20px 0;
+	margin-bottom: 25px;
+}
+
+.totalLine {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 10px;
+	font-size: 16px;
+	color: #666;
+}
+
+.finalTotal {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 15px;
+	padding-top: 15px;
+	border-top: 1px solid #e0e0e0;
+	font-size: 20px;
+	font-weight: 700;
+	color: #333;
+}
+
+.checkoutBtn {
+	width: 100%;
+	padding: 16px;
+	background: #ff6b35;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-size: 18px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s ease;
+	margin-bottom: 15px;
+
+	&:hover {
+		background: #e55a2b;
+	}
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+	.cartContent {
+		grid-template-columns: 1fr;
+		gap: 20px;
+	}
+
+	.cartItem {
+		grid-template-columns: 60px 1fr;
+		gap: 15px;
+	}
+
+	.itemControls {
+		grid-column: 1 / -1;
+		flex-direction: row;
+		justify-content: space-between;
+		margin-top: 15px;
+	}
+}
+// Добавляем в существующий файл
+.orderButtons {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
+	margin-bottom: 20px;
+}
+
+.pickupBtn,
+.deliveryBtn {
+	padding: 15px;
+	border: none;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.pickupBtn {
+	background: #ff6b35;
+	color: white;
+
+	&:hover {
+		background: #e55a2b;
+	}
+}
+
+.deliveryBtn {
+	background: #28a745;
+	color: white;
+
+	&:hover {
+		background: #218838;
+	}
+}
+// Добавляем в существующие стили:
+.authWarning {
+	background: #fff3cd;
+	border: 1px solid #ffeaa7;
+	border-radius: 6px;
+	padding: 12px;
+	margin-bottom: 15px;
+	text-align: center;
+
+	p {
+		margin: 0;
+		color: #856404;
+		font-size: 14px;
+	}
+}
+
+// Обновляем стили кнопок для disabled состояния:
+.pickupBtn:disabled,
+.deliveryBtn:disabled {
+	background: #ccc;
+	cursor: not-allowed;
+
+	&:hover {
+		background: #ccc;
+	}
+}
+// Остальные стили остаются без изменений...

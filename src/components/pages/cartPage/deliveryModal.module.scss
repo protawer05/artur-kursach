@@ -1,0 +1,166 @@
+.modalOverlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	padding: 20px;
+}
+
+.modalContent {
+	background: white;
+	border-radius: 12px;
+	max-width: 500px;
+	width: 100%;
+	max-height: 90vh;
+	overflow-y: auto;
+}
+
+.modalHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 20px;
+	border-bottom: 1px solid #e0e0e0;
+
+	h2 {
+		margin: 0;
+		font-size: 24px;
+		color: #333;
+	}
+}
+
+.closeBtn {
+	background: none;
+	border: none;
+	font-size: 30px;
+	cursor: pointer;
+	color: #666;
+	padding: 0;
+	width: 30px;
+	height: 30px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	&:hover {
+		color: #333;
+	}
+}
+
+.deliveryForm {
+	padding: 20px;
+}
+
+.addressSection,
+.contactSection {
+	margin-bottom: 20px;
+
+	h3 {
+		margin: 0 0 15px 0;
+		font-size: 18px;
+		color: #333;
+	}
+}
+
+.formRow {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 15px;
+	margin-bottom: 15px;
+}
+
+.formGroup {
+	display: flex;
+	flex-direction: column;
+
+	label {
+		margin-bottom: 5px;
+		font-weight: 600;
+		color: #333;
+		font-size: 14px;
+	}
+
+	input,
+	textarea {
+		padding: 10px;
+		border: 2px solid #e0e0e0;
+		border-radius: 6px;
+		font-size: 14px;
+		transition: border-color 0.2s ease;
+
+		&:focus {
+			outline: none;
+			border-color: #ff6b35;
+		}
+
+		&::placeholder {
+			color: #999;
+		}
+	}
+
+	textarea {
+		resize: vertical;
+		min-height: 80px;
+	}
+}
+
+.divider {
+	height: 1px;
+	background: #e0e0e0;
+	margin: 20px 0;
+}
+
+.modalFooter {
+	text-align: center;
+	margin-top: 20px;
+}
+
+.orderBtn {
+	padding: 15px 30px;
+	background: #ff6b35;
+	color: white;
+	border: none;
+	border-radius: 8px;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s ease;
+	width: 100%;
+
+	&:hover {
+		background: #e55a2b;
+	}
+}
+
+@media (max-width: 768px) {
+	.modalOverlay {
+		padding: 10px;
+	}
+
+	.modalContent {
+		max-height: 95vh;
+	}
+
+	.modalHeader {
+		padding: 15px;
+
+		h2 {
+			font-size: 20px;
+		}
+	}
+
+	.deliveryForm {
+		padding: 15px;
+	}
+
+	.formRow {
+		grid-template-columns: 1fr;
+		gap: 10px;
+	}
+}

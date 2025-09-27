@@ -20,7 +20,7 @@ code {
 
 .content {
 	flex: 1; /* Занимает всё доступное пространство */
-	background-color: gray;
+	background-color: #dadada;
 }
 * {
 	font-family: 'Montserrat', sans-serif;
