@@ -7,23 +7,131 @@
 	align-items: center;
 	justify-content: space-between;
 	padding: 20px;
-	padding-left: 100px;
-	padding-right: 100px;
+
 	.text {
 		font-size: 20px;
+		font-weight: 500;
 	}
+
 	.socials {
 		display: flex;
 		gap: 20px;
-	}
-	.socials a:hover {
-		opacity: 0.7;
-		transform: scale(1.1);
-		background-color: rgba(255, 255, 255, 0.1);
+
+		a {
+			transition: all 0.3s ease;
+			border-radius: 8px;
+			padding: 5px;
+
+			&:hover {
+				opacity: 0.7;
+				transform: scale(1.1);
+				background-color: rgba(255, 255, 255, 0.1);
+			}
+		}
 	}
 }
+
 .socials img {
 	width: 40px;
 	height: 40px;
 	transition: all 0.3s ease;
+}
+
+/* Планшеты (768px - 1024px) */
+@media (max-width: 1024px) {
+	.footer {
+		padding: 20px 50px;
+
+		.text {
+			font-size: 18px;
+		}
+	}
+
+	.socials img {
+		width: 35px;
+		height: 35px;
+	}
+}
+
+/* Мобильные устройства (576px - 768px) */
+@media (max-width: 768px) {
+	.footer {
+		padding: 20px 30px;
+		flex-direction: column;
+		gap: 20px;
+		text-align: center;
+
+		.text {
+			font-size: 16px;
+			order: 2;
+		}
+
+		.socials {
+			order: 1;
+			gap: 15px;
+		}
+	}
+
+	.socials img {
+		width: 32px;
+		height: 32px;
+	}
+}
+
+/* Маленькие мобильные устройства (до 576px) */
+@media (max-width: 576px) {
+	.footer {
+		padding: 15px 20px;
+		gap: 15px;
+
+		.text {
+			font-size: 14px;
+			line-height: 1.4;
+		}
+
+		.socials {
+			gap: 12px;
+		}
+	}
+
+	.socials img {
+		width: 28px;
+		height: 28px;
+	}
+}
+
+/* Очень маленькие устройства (до 400px) */
+@media (max-width: 400px) {
+	.footer {
+		padding: 12px 15px;
+
+		.text {
+			font-size: 13px;
+		}
+
+		.socials {
+			gap: 10px;
+		}
+	}
+
+	.socials img {
+		width: 24px;
+		height: 24px;
+	}
+}
+
+/* Большие экраны (более 1440px) */
+@media (min-width: 1440px) {
+	.footer {
+		padding: 25px 150px;
+
+		.text {
+			font-size: 22px;
+		}
+	}
+
+	.socials img {
+		width: 42px;
+		height: 42px;
+	}
 }

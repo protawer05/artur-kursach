@@ -7,50 +7,50 @@ const ProductList = ({ onAddToCart }) => {
 	const initialProducts = [
 		{
 			id: 1,
-			name: 'Том Ям',
-			price: 290,
-			category: 'супы',
-			thumbnail:
-				'https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg',
-		},
-		{
-			id: 2,
-			name: 'Пад Тай',
-			price: 320,
-			category: 'основные',
-			thumbnail:
-				'https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg',
-		},
-		{
-			id: 3,
-			name: 'Том Кха',
-			price: 310,
-			category: 'супы',
-			thumbnail:
-				'https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg',
-		},
-		{
-			id: 4,
-			name: 'Грин Карри',
-			price: 350,
-			category: 'карри',
-			thumbnail:
-				'https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg',
-		},
-		{
-			id: 5,
-			name: 'Спринг Роллы',
+			name: 'Спринг роллы',
 			price: 280,
 			category: 'закуски',
 			thumbnail:
-				'https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg',
+				'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQnD4Z-qc0M2axIeXHmvxMhWXnGkANnRvqTmA&s',
+		},
+		{
+			id: 2,
+			name: 'Салат с папайей',
+			price: 260,
+			category: 'салаты',
+			thumbnail:
+				'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQY8-RhiuKOXPECJTbZuE_YRYeG67ioexOL9w&s',
+		},
+		{
+			id: 3,
+			name: 'Сет роллов',
+			price: 720,
+			category: 'сеты',
+			thumbnail:
+				'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRA1Z1QYIA9ddG2y9CahvPJLm1y8CRpkLP-NA&s',
+		},
+		{
+			id: 4,
+			name: 'Набор для компании',
+			price: 1200,
+			category: 'наборы',
+			thumbnail:
+				'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDcyCIwcKerOU75FJH4ep4eWayr-TJ03QLxA&s',
+		},
+		{
+			id: 5,
+			name: 'Мини-сет закусок',
+			price: 540,
+			category: 'сеты',
+			thumbnail:
+				'https://deliveryfood.ru/pageimage/mini-zakuski-dlya-fursheta-foto.webp',
 		},
 	]
 
 	const [products] = useState(initialProducts)
 	const [activeFilter, setActiveFilter] = useState('все')
 
-	const filters = ['все', 'супы', 'основные', 'карри', 'закуски']
+	const filters = ['все', 'наборы', 'сеты', 'закуски', 'салаты']
 
 	const filteredProducts =
 		activeFilter === 'все'
