@@ -6,10 +6,17 @@ import searchIcon from '../assets/bx_bx-search-alt-2.svg'
 import cartIcon from '../assets/Shopping cart.svg'
 import phoneIcon from '../assets/phone.svg'
 
-function Header({ cartItemsCount = 0, currentUser, onProfileClick, onLogout }) {
+function Header({
+	cartItemsCount = 0,
+	currentUser,
+	onProfileClick,
+	onLogout,
+	onSearch,
+}) {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const [isScrolled, setIsScrolled] = useState(false)
 	const [showUserMenu, setShowUserMenu] = useState(false)
+	const [searchQuery, setSearchQuery] = useState('')
 	const navigate = useNavigate()
 
 	useEffect(() => {
@@ -20,6 +27,13 @@ function Header({ cartItemsCount = 0, currentUser, onProfileClick, onLogout }) {
 		window.addEventListener('scroll', handleScroll)
 		return () => window.removeEventListener('scroll', handleScroll)
 	}, [])
+
+	// Поиск товаров при изменении запроса
+	useEffect(() => {
+		if (onSearch) {
+			onSearch(searchQuery)
+		}
+	}, [searchQuery, onSearch])
 
 	const handleLinkClick = () => {
 		setIsMenuOpen(false)
@@ -46,6 +60,22 @@ function Header({ cartItemsCount = 0, currentUser, onProfileClick, onLogout }) {
 		setIsMenuOpen(false)
 	}
 
+	const handleSearchChange = e => {
+		setSearchQuery(e.target.value)
+	}
+
+	const handleSearchSubmit = e => {
+		e.preventDefault()
+		// Поиск уже работает автоматически, форма нужна для accessibility
+	}
+
+	const clearSearch = () => {
+		setSearchQuery('')
+		if (onSearch) {
+			onSearch('')
+		}
+	}
+
 	return (
 		<header className={s.header}>
 			<Link className={s.logo} to='/' onClick={handleLinkClick}>
@@ -53,8 +83,24 @@ function Header({ cartItemsCount = 0, currentUser, onProfileClick, onLogout }) {
 			</Link>
 
 			<div className={s.search}>
-				<img src={searchIcon} alt='Поиск' />
-				<input type='text' placeholder='Поиск' />
+				<form onSubmit={handleSearchSubmit}>
+					<img src={searchIcon} alt='Поиск' />
+					<input
+						type='text'
+						placeholder='Поиск блюд...'
+						value={searchQuery}
+						onChange={handleSearchChange}
+					/>
+					{searchQuery && (
+						<button
+							type='button'
+							className={s.clearButton}
+							onClick={clearSearch}
+						>
+							×
+						</button>
+					)}
+				</form>
 			</div>
 
 			<button

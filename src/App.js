@@ -5,15 +5,15 @@ import ProductList from './components/pages/mainPage/ProductList'
 import CartPage from './components/pages/cartPage/CartPage'
 import ProfilePage from './components/pages/profilePage/ProfilePage'
 import Footer from './components/footer/Footer'
-import AuthModal from './components/authModal.module.scss/AuthModal'
+import AuthModal from './components/authModal/AuthModal'
 import { useState, useEffect } from 'react'
 
 function App() {
 	const [cartItems, setCartItems] = useState([])
 	const [currentUser, setCurrentUser] = useState(null)
 	const [showAuthModal, setShowAuthModal] = useState(false)
+	const [searchQuery, setSearchQuery] = useState('')
 
-	// Загрузка данных при старте
 	useEffect(() => {
 		const savedCart = localStorage.getItem('cartItems')
 		const savedUser = localStorage.getItem('currentUser')
@@ -27,7 +27,6 @@ function App() {
 		}
 	}, [])
 
-	// Сохранение данных при изменении
 	useEffect(() => {
 		localStorage.setItem('cartItems', JSON.stringify(cartItems))
 	}, [cartItems])
@@ -88,9 +87,13 @@ function App() {
 	const handleProfileClick = () => {
 		if (!currentUser) {
 			setShowAuthModal(true)
-			return false // Предотвращаем переход
+			return false
 		}
-		return true // Разрешаем переход
+		return true
+	}
+
+	const handleSearch = query => {
+		setSearchQuery(query)
 	}
 
 	return (
@@ -100,13 +103,19 @@ function App() {
 				currentUser={currentUser}
 				onProfileClick={handleProfileClick}
 				onLogout={handleLogout}
+				onSearch={handleSearch}
 			/>
 
 			<div className='content'>
 				<Routes>
 					<Route
 						path='/'
-						element={<ProductList onAddToCart={handleAddToCart} />}
+						element={
+							<ProductList
+								onAddToCart={handleAddToCart}
+								searchQuery={searchQuery}
+							/>
+						}
 					/>
 					<Route
 						path='/cart'
@@ -116,7 +125,7 @@ function App() {
 								onUpdateQuantity={handleUpdateQuantity}
 								onRemoveItem={handleRemoveItem}
 								onClearCart={handleClearCart}
-								currentUser={currentUser} // Добавляем передачу currentUser
+								currentUser={currentUser}
 							/>
 						}
 					/>

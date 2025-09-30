@@ -1,22 +1,26 @@
 import React, { useState } from 'react'
 import styles from './productCard.module.scss'
 
-const ProductCard = ({ product, onAddToCart }) => {
+const ProductCard = ({ product, onAddToCart, onProductClick }) => {
 	const [quantity, setQuantity] = useState(1)
 
 	const handleIncrement = () => setQuantity(prev => prev + 1)
 	const handleDecrement = () => quantity > 1 && setQuantity(prev => prev - 1)
 
-	const handleAddToCart = () => {
-		console.log('ProductCard - Добавление в корзину:', product, quantity) // Debug log
-		if (onAddToCart) {
-			onAddToCart(product, quantity)
-			setQuantity(1)
+	const handleAddToCart = e => {
+		e.stopPropagation()
+		onAddToCart(product, quantity)
+		setQuantity(1)
+	}
+
+	const handleCardClick = () => {
+		if (onProductClick) {
+			onProductClick(product)
 		}
 	}
 
 	return (
-		<div className={styles.card}>
+		<div className={styles.card} onClick={handleCardClick}>
 			<div className={styles.imageContainer}>
 				<img
 					src={product.thumbnail}
@@ -33,13 +37,22 @@ const ProductCard = ({ product, onAddToCart }) => {
 			<div className={styles.quantityControls}>
 				<button
 					className={styles.quantityBtn}
-					onClick={handleDecrement}
+					onClick={e => {
+						e.stopPropagation()
+						handleDecrement()
+					}}
 					disabled={quantity <= 1}
 				>
 					-
 				</button>
 				<span className={styles.quantity}>{quantity} шт</span>
-				<button className={styles.quantityBtn} onClick={handleIncrement}>
+				<button
+					className={styles.quantityBtn}
+					onClick={e => {
+						e.stopPropagation()
+						handleIncrement()
+					}}
+				>
 					+
 				</button>
 			</div>

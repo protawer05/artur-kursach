@@ -6,7 +6,8 @@
 	background: white;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 	max-width: 280px;
-	transition: transform 0.2s ease, box-shadow 0.2s ease;
+	transition: all 0.2s ease;
+	cursor: pointer;
 
 	&:hover {
 		transform: translateY(-2px);
@@ -28,7 +29,7 @@
 	object-fit: cover;
 	transition: transform 0.3s ease;
 
-	&:hover {
+	.card:hover & {
 		transform: scale(1.05);
 	}
 }

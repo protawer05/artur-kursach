@@ -16,18 +16,21 @@ const AuthModal = ({ onClose, onLogin }) => {
 		setIsLoading(true)
 
 		try {
+			// Форматируем номер телефона
+			const formattedPhone = phone.replace(/\D/g, '')
+
 			// Проверяем, есть ли пользователь с таким номером
 			const response = await fetch(
 				'https://68d662abc2a1754b426a8851.mockapi.io/users'
 			)
 			const users = await response.json()
 
-			let user = users.find(u => u.phone === phone)
+			let user = users.find(u => u.phone === formattedPhone)
 
 			if (!user) {
 				// Создаем нового пользователя
 				const newUser = {
-					phone: phone,
+					phone: formattedPhone,
 					name: 'Новый пользователь',
 					email: '',
 					address: '',
@@ -53,10 +56,43 @@ const AuthModal = ({ onClose, onLogin }) => {
 			onLogin(user)
 		} catch (error) {
 			console.error('Ошибка авторизации:', error)
-			alert('Ошибка при авторизации. Попробуйте еще раз.')
+			// Создаем локального пользователя при ошибке API
+			const localUser = {
+				id: Date.now().toString(),
+				phone: phone.replace(/\D/g, ''),
+				name: 'Новый пользователь',
+				email: '',
+				address: '',
+				createdAt: new Date().toISOString(),
+			}
+
+			localStorage.setItem('currentUser', JSON.stringify(localUser))
+			onLogin(localUser)
 		} finally {
 			setIsLoading(false)
 		}
+	}
+
+	const formatPhone = value => {
+		const numbers = value.replace(/\D/g, '')
+		if (numbers.length <= 1) return numbers
+		if (numbers.length <= 4) return `+7 (${numbers.slice(1, 4)}`
+		if (numbers.length <= 7)
+			return `+7 (${numbers.slice(1, 4)}) ${numbers.slice(4, 7)}`
+		if (numbers.length <= 9)
+			return `+7 (${numbers.slice(1, 4)}) ${numbers.slice(
+				4,
+				7
+			)}-${numbers.slice(7, 9)}`
+		return `+7 (${numbers.slice(1, 4)}) ${numbers.slice(4, 7)}-${numbers.slice(
+			7,
+			9
+		)}-${numbers.slice(9, 11)}`
+	}
+
+	const handlePhoneChange = e => {
+		const formatted = formatPhone(e.target.value)
+		setPhone(formatted)
 	}
 
 	return (
@@ -76,7 +112,7 @@ const AuthModal = ({ onClose, onLogin }) => {
 							type='tel'
 							placeholder='+7 (999) 999-99-99'
 							value={phone}
-							onChange={e => setPhone(e.target.value)}
+							onChange={handlePhoneChange}
 							required
 						/>
 					</div>

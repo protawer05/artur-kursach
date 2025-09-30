@@ -13,7 +13,17 @@ const ProductFilter = ({ filters, activeFilter, onFilterChange }) => {
 						}`}
 						onClick={() => onFilterChange(filter)}
 					>
-						{filter}
+						{filter === 'все'
+							? 'Все блюда'
+							: filter === 'супы'
+							? 'Супы'
+							: filter === 'горячее'
+							? 'Горячие блюда'
+							: filter === 'закуски'
+							? 'Закуски'
+							: filter === 'напитки'
+							? 'Напитки'
+							: filter}
 					</button>
 				))}
 			</div>

@@ -29,3 +29,86 @@
 		gap: 10px;
 	}
 }
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 20px;
+}
+
+.searchInfo {
+	text-align: center;
+	margin-bottom: 30px;
+	padding: 20px;
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+	h2 {
+		color: #333;
+		margin-bottom: 10px;
+	}
+
+	p {
+		color: #666;
+		margin: 0;
+	}
+}
+
+.productsGrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 20px;
+	justify-items: center;
+}
+
+.noProducts {
+	text-align: center;
+	padding: 60px 20px;
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+	h3 {
+		color: #333;
+		margin-bottom: 10px;
+	}
+
+	p {
+		color: #666;
+		margin: 0;
+	}
+}
+
+.loading,
+.error {
+	text-align: center;
+	padding: 40px;
+	font-size: 18px;
+}
+
+.loading {
+	color: #666;
+}
+
+.error {
+	color: #dc3545;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+	.container {
+		padding: 15px;
+	}
+
+	.productsGrid {
+		grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+		gap: 15px;
+	}
+}
+
+@media (max-width: 576px) {
+	.productsGrid {
+		grid-template-columns: 1fr;
+		gap: 10px;
+	}
+}
