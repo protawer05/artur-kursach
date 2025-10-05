@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import s from './profilePage.module.scss'
 
 const ProfilePage = ({ currentUser, onUserUpdate }) => {
@@ -7,12 +7,44 @@ const ProfilePage = ({ currentUser, onUserUpdate }) => {
 	const [isLoading, setIsLoading] = useState(true)
 	const [isEditing, setIsEditing] = useState(false)
 
+	const statusTimings = {
+		processing: 1,
+		cooking: 2,
+		delivering: 3,
+		delivered: 4,
+	}
+
 	useEffect(() => {
 		if (currentUser) {
 			setUserData(currentUser)
 			fetchOrders()
 		}
+		// eslint-disable-next-line
 	}, [currentUser])
+
+	const getCurrentStatus = orderDate => {
+		const now = new Date()
+		const orderTime = new Date(orderDate)
+		const diffInMinutes = Math.floor((now - orderTime) / (1000 * 60))
+
+		if (diffInMinutes >= statusTimings.delivered) return 'delivered'
+		if (diffInMinutes >= statusTimings.delivering) return 'delivering'
+		if (diffInMinutes >= statusTimings.cooking) return 'cooking'
+		if (diffInMinutes >= statusTimings.processing) return 'processing'
+
+		return 'processing'
+	}
+
+	const getProgressPercentage = orderDate => {
+		const now = new Date()
+		const orderTime = new Date(orderDate)
+		const diffInMinutes = Math.floor((now - orderTime) / (1000 * 60))
+
+		const totalStages = Object.keys(statusTimings).length
+		const currentStage = Math.min(diffInMinutes + 1, totalStages)
+
+		return (currentStage / totalStages) * 100
+	}
 
 	const fetchOrders = async () => {
 		try {
@@ -21,7 +53,16 @@ const ProfilePage = ({ currentUser, onUserUpdate }) => {
 			)
 			if (!response.ok) throw new Error('Orders not found')
 			const data = await response.json()
-			setOrders(Array.isArray(data) ? data : [])
+
+			const ordersWithCalculatedStatus = Array.isArray(data)
+				? data.map(order => ({
+						...order,
+						calculatedStatus: getCurrentStatus(order.date),
+						progress: getProgressPercentage(order.date),
+				  }))
+				: []
+
+			setOrders(ordersWithCalculatedStatus)
 		} catch (error) {
 			console.error('Ошибка загрузки заказов:', error)
 			setOrders([])
@@ -29,6 +70,21 @@ const ProfilePage = ({ currentUser, onUserUpdate }) => {
 			setIsLoading(false)
 		}
 	}
+
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setOrders(prevOrders =>
+				prevOrders.map(order => ({
+					...order,
+					calculatedStatus: getCurrentStatus(order.date),
+					progress: getProgressPercentage(order.date),
+				}))
+			)
+		}, 60000)
+
+		return () => clearInterval(interval)
+		// eslint-disable-next-line
+	}, [])
 
 	const handleSave = async () => {
 		try {
@@ -56,7 +112,6 @@ const ProfilePage = ({ currentUser, onUserUpdate }) => {
 			}
 		} catch (error) {
 			console.error('Ошибка сохранения данных:', error)
-			// Локальное сохранение
 			onUserUpdate(userData)
 			setIsEditing(false)
 			alert('Данные сохранены локально')
@@ -72,18 +127,52 @@ const ProfilePage = ({ currentUser, onUserUpdate }) => {
 
 	const getStatusText = status => {
 		switch (status) {
-			case 'completed':
-				return 'Выполнен'
-			case 'delivered':
-				return 'Доставлен'
 			case 'processing':
 				return 'В обработке'
 			case 'cooking':
 				return 'Готовится'
-			case 'confirmed':
-				return 'В обработке'
+			case 'delivering':
+				return 'Доставляется'
+			case 'delivered':
+				return 'Доставлен'
+			case 'completed':
+				return 'Выполнен'
 			default:
 				return status
+		}
+	}
+
+	const getStatusColor = status => {
+		switch (status) {
+			case 'processing':
+				return '#fff3cd'
+			case 'cooking':
+				return '#d1ecf1'
+			case 'delivering':
+				return '#cce7ff'
+			case 'delivered':
+				return '#d4edda'
+			case 'completed':
+				return '#d4edda'
+			default:
+				return '#e9ecef'
+		}
+	}
+
+	const getStatusTextColor = status => {
+		switch (status) {
+			case 'processing':
+				return '#856404'
+			case 'cooking':
+				return '#0c5460'
+			case 'delivering':
+				return '#004085'
+			case 'delivered':
+				return '#155724'
+			case 'completed':
+				return '#155724'
+			default:
+				return '#495057'
 		}
 	}
 
@@ -96,6 +185,51 @@ const ProfilePage = ({ currentUser, onUserUpdate }) => {
 			minute: '2-digit',
 		})
 	}
+
+	const getTimePassed = orderDate => {
+		const now = new Date()
+		const orderTime = new Date(orderDate)
+		const diffInMinutes = Math.floor((now - orderTime) / (1000 * 60))
+
+		if (diffInMinutes < 1) return 'только что'
+		if (diffInMinutes === 1) return '1 минуту назад'
+		if (diffInMinutes < 5) return `${diffInMinutes} минуты назад`
+		if (diffInMinutes < 60) return `${diffInMinutes} минут назад`
+
+		const diffInHours = Math.floor(diffInMinutes / 60)
+		if (diffInHours === 1) return '1 час назад'
+		if (diffInHours < 5) return `${diffInHours} часа назад`
+		return `${diffInHours} часов назад`
+	}
+
+	// Функция для безопасного отображения pickupPoint
+	const renderPickupPoint = pickupPoint => {
+		if (!pickupPoint) return null
+
+		if (typeof pickupPoint === 'string') {
+			return pickupPoint
+		}
+
+		if (typeof pickupPoint === 'object') {
+			return (
+				pickupPoint.name || pickupPoint.address || JSON.stringify(pickupPoint)
+			)
+		}
+
+		return String(pickupPoint)
+	}
+
+	const sortedOrders = [...orders].sort((a, b) => {
+		const aIsActive =
+			a.calculatedStatus !== 'delivered' && a.calculatedStatus !== 'completed'
+		const bIsActive =
+			b.calculatedStatus !== 'delivered' && b.calculatedStatus !== 'completed'
+
+		if (aIsActive && !bIsActive) return -1
+		if (!aIsActive && bIsActive) return 1
+
+		return new Date(b.date) - new Date(a.date)
+	})
 
 	if (isLoading) {
 		return <div className={s.loading}>Загрузка...</div>
@@ -191,30 +325,113 @@ const ProfilePage = ({ currentUser, onUserUpdate }) => {
 
 					<div className={s.ordersHistory}>
 						<h2>История заказов</h2>
-						{orders.length === 0 ? (
+						{sortedOrders.length === 0 ? (
 							<p className={s.noOrders}>У вас пока нет заказов</p>
 						) : (
 							<div className={s.ordersList}>
-								{orders.map(order => (
+								{sortedOrders.map(order => (
 									<div key={order.id} className={s.orderItem}>
 										<div className={s.orderHeader}>
-											<span className={s.orderDate}>
-												Заказ от {formatDate(order.date)}
-											</span>
-											<span className={`${s.orderStatus} ${s[order.status]}`}>
-												{getStatusText(order.status)}
+											<div className={s.orderInfo}>
+												<span className={s.orderNumber}>
+													Заказ {order.orderNumber}
+												</span>
+												<span className={s.orderDate}>
+													{formatDate(order.date)} • {getTimePassed(order.date)}
+												</span>
+											</div>
+											<span
+												className={s.orderStatus}
+												style={{
+													backgroundColor: getStatusColor(
+														order.calculatedStatus
+													),
+													color: getStatusTextColor(order.calculatedStatus),
+												}}
+											>
+												{getStatusText(order.calculatedStatus)}
 											</span>
 										</div>
+
+										{(order.calculatedStatus === 'processing' ||
+											order.calculatedStatus === 'cooking' ||
+											order.calculatedStatus === 'delivering') && (
+											<div className={s.progressContainer}>
+												<div className={s.progressBar}>
+													<div
+														className={s.progressFill}
+														style={{ width: `${order.progress}%` }}
+													></div>
+												</div>
+												<div className={s.progressSteps}>
+													<span
+														className={
+															order.calculatedStatus === 'processing'
+																? s.active
+																: ''
+														}
+													>
+														Обработка
+													</span>
+													<span
+														className={
+															order.calculatedStatus === 'cooking'
+																? s.active
+																: ''
+														}
+													>
+														Приготовление
+													</span>
+													<span
+														className={
+															order.calculatedStatus === 'delivering'
+																? s.active
+																: ''
+														}
+													>
+														Доставка
+													</span>
+													<span
+														className={
+															order.calculatedStatus === 'delivered'
+																? s.active
+																: ''
+														}
+													>
+														Завершен
+													</span>
+												</div>
+											</div>
+										)}
+
 										<div className={s.orderDetails}>
+											<div className={s.orderType}>
+												<strong>Тип:</strong>{' '}
+												{order.type === 'delivery' ? 'Доставка' : 'Самовывоз'}
+											</div>
 											<div className={s.orderTotal}>
-												Сумма: <strong>{order.total} руб</strong>
+												<strong>Сумма:</strong> {order.total} руб
 											</div>
 											<div className={s.orderItems}>
-												Товары:{' '}
+												<strong>Товары:</strong>{' '}
 												{order.items
 													.map(item => `${item.name} (${item.quantity} шт)`)
 													.join(', ')}
 											</div>
+
+											{order.deliveryAddress && (
+												<div className={s.orderAddress}>
+													<strong>Адрес доставки:</strong>{' '}
+													{order.deliveryAddress}
+												</div>
+											)}
+
+											{order.pickupPoint && (
+												<div className={s.orderPickup}>
+													<strong>Точка самовывоза:</strong>{' '}
+													{renderPickupPoint(order.pickupPoint)}
+												</div>
+											)}
 										</div>
 									</div>
 								))}

@@ -89,7 +89,6 @@ const CartPage = ({
 
 	const handlePickupOrder = async pickupPoint => {
 		try {
-			// Проверяем авторизацию пользователя
 			if (!currentUser) {
 				showNotification(
 					'Для оформления заказа необходимо войти в аккаунт',
@@ -98,14 +97,18 @@ const CartPage = ({
 				return
 			}
 
+			// Исправлено: передаем только нужные данные, а не весь объект
 			const orderData = {
 				type: 'pickup',
 				items: cartItems,
-				pickupPoint,
+				pickupPoint: {
+					name: pickupPoint.name,
+					address: pickupPoint.address,
+				}, // Передаем только строки, а не объект
 				total,
-				status: 'confirmed',
+				status: 'processing',
 				date: new Date().toISOString(),
-				userId: currentUser.id, // Привязываем заказ к пользователю
+				userId: currentUser.id,
 				userPhone: currentUser.phone,
 				orderNumber: `ORD-${Date.now()}`,
 			}
@@ -142,7 +145,6 @@ const CartPage = ({
 
 	const handleDeliveryOrder = async deliveryData => {
 		try {
-			// Проверяем авторизацию пользователя
 			if (!currentUser) {
 				showNotification(
 					'Для оформления заказа необходимо войти в аккаунт',
@@ -154,11 +156,17 @@ const CartPage = ({
 			const orderData = {
 				type: 'delivery',
 				items: cartItems,
-				deliveryData,
+				deliveryData: {
+					street: deliveryData.street,
+					house: deliveryData.house,
+					entrance: deliveryData.entrance,
+					apartment: deliveryData.apartment,
+					phone: deliveryData.phone,
+				}, // Передаем только нужные поля
 				total,
-				status: 'confirmed',
+				status: 'processing',
 				date: new Date().toISOString(),
-				userId: currentUser.id, // Привязываем заказ к пользователю
+				userId: currentUser.id,
 				userPhone: currentUser.phone,
 				orderNumber: `ORD-${Date.now()}`,
 			}

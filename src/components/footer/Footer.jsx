@@ -35,7 +35,7 @@ const Footer = () => {
 
 	return (
 		<footer className={s.footer}>
-			<div className={s.text}>© 2025 Foodies. Все права защищены</div>
+			<div className={s.text}>© 2025 Artur Food. Все права защищены</div>
 
 			<div className={s.socials}>
 				{socialLinks.map((link, index) => (
