@@ -1,0 +1,809 @@
+# ДАМП ПРОЕКТА: React Food Delivery App с SQLite
+
+## 📁 СТРУКТУРА ПРОЕКТА
+
+```
+foodies-app/
+├── 📄 package.json
+├── 📄 server.js
+├── 📄 init-db.js
+├── 📄 foodies.db (создастся автоматически)
+├── 📁 src/
+│   ├── 📄 App.js
+│   ├── 📄 index.js
+│   ├── 📁 components/
+│   │   ├── 📁 header/
+│   │   │   ├── 📄 Header.jsx
+│   │   │   └── 📄 header.module.scss
+│   │   ├── 📁 productList/
+│   │   │   ├── 📄 ProductList.jsx
+│   │   │   ├── 📄 productList.module.scss
+│   │   │   ├── 📄 ProductCard.jsx
+│   │   │   ├── 📄 productCard.module.scss
+│   │   │   ├── 📄 ProductFilter.jsx
+│   │   │   └── 📄 productFilter.module.scss
+│   │   ├── 📁 pages/
+│   │   │   ├── 📁 cartPage/
+│   │   │   │   ├── 📄 CartPage.jsx
+│   │   │   │   ├── 📄 cartPage.module.scss
+│   │   │   │   ├── 📄 PickupModal.jsx
+│   │   │   │   ├── 📄 pickupModal.module.scss
+│   │   │   │   ├── 📄 DeliveryModal.jsx
+│   │   │   │   └── 📄 deliveryModal.module.scss
+│   │   │   ├── 📁 profilePage/
+│   │   │   │   ├── 📄 ProfilePage.jsx
+│   │   │   │   └── 📄 profilePage.module.scss
+│   │   │   └── 📁 mainPage/
+│   │   │       ├── 📄 MainPage.jsx
+│   │   │       └── 📄 mainPage.module.scss
+│   │   ├── 📁 ui/
+│   │   │   ├── 📄 AuthModal.jsx
+│   │   │   ├── 📄 authModal.module.scss
+│   │   │   ├── 📄 Notification.jsx
+│   │   │   ├── 📄 notification.module.scss
+│   │   │   ├── 📄 ProductModal.jsx
+│   │   │   └── 📄 productModal.module.scss
+│   │   └── 📁 footer/
+│   │       ├── 📄 Footer.jsx
+│   │       └── 📄 footer.module.scss
+│   └── 📁 services/
+│       ├── 📄 database.js
+│       ├── 📄 api.js
+│       └── 📄 orderStatusService.js
+└── 📁 assets/
+    ├── 📄 Logo.png
+    ├── 📄 bx_bx-search-alt-2.svg
+    ├── 📄 Shopping cart.svg
+    └── 📄 phone.svg
+```
+
+## 🗃️ СХЕМА БАЗЫ ДАННЫХ
+
+### Таблица: users
+```sql
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  phone TEXT UNIQUE NOT NULL,
+  name TEXT,
+  email TEXT,
+  address TEXT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Таблица: products
+```sql
+CREATE TABLE products (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  price INTEGER NOT NULL,
+  category TEXT NOT NULL,
+  thumbnail TEXT,
+  description TEXT,
+  ingredients TEXT,
+  weight TEXT,
+  volume TEXT,
+  cookingTime TEXT,
+  createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+### Таблица: orders
+```sql
+CREATE TABLE orders (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  orderNumber TEXT UNIQUE NOT NULL,
+  userId INTEGER NOT NULL,
+  type TEXT NOT NULL,
+  status TEXT DEFAULT 'processing',
+  total INTEGER NOT NULL,
+  items TEXT NOT NULL,
+  pickupPoint TEXT,
+  deliveryData TEXT,
+  userPhone TEXT NOT NULL,
+  date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (userId) REFERENCES users (id)
+);
+```
+
+## 📦 ЗАВИСИМОСТИ package.json
+
+```json
+{
+  "name": "foodies-app",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "react-scripts start",
+    "build": "react-scripts build",
+    "server": "node server.js",
+    "init-db": "node init-db.js"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.8.0",
+    "react-scripts": "5.0.1",
+    "sqlite3": "^5.1.6",
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}
+```
+
+## 🔧 КЛЮЧЕВЫЕ ФАЙЛЫ
+
+### 1. server.js
+```javascript
+const express = require('express');
+const cors = require('cors');
+const database = require('./src/services/database');
+
+const app = express();
+const PORT = 3001;
+
+app.use(cors());
+app.use(express.json());
+
+// Роуты для продуктов
+app.get('/api/products', async (req, res) => {
+  try {
+    const products = await database.getAllProducts();
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/products/category/:category', async (req, res) => {
+  try {
+    const products = await database.getProductsByCategory(req.params.category);
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/products/search', async (req, res) => {
+  try {
+    const products = await database.searchProducts(req.query.q);
+    res.json(products);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Роуты для пользователей
+app.get('/api/users/:id', async (req, res) => {
+  try {
+    const user = await database.getUserById(req.params.id);
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(404).json({ error: 'Пользователь не найден' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/users', async (req, res) => {
+  try {
+    const user = await database.createUser(req.body);
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/users/:id', async (req, res) => {
+  try {
+    const user = await database.updateUser(req.params.id, req.body);
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Роуты для заказов
+app.post('/api/orders', async (req, res) => {
+  try {
+    const order = await database.createOrder(req.body);
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/orders/user/:userId', async (req, res) => {
+  try {
+    const orders = await database.getOrdersByUserId(req.params.userId);
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.put('/api/orders/:id/status', async (req, res) => {
+  try {
+    const order = await database.updateOrderStatus(req.params.id, req.body.status);
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Сервер запущен на порту ${PORT}`);
+});
+```
+
+### 2. init-db.js
+```javascript
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+
+const dbPath = path.join(__dirname, 'foodies.db');
+const db = new sqlite3.Database(dbPath);
+
+// Создание таблиц
+db.serialize(() => {
+  // Таблица пользователей
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    phone TEXT UNIQUE NOT NULL,
+    name TEXT,
+    email TEXT,
+    address TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // Таблица продуктов
+  db.run(`CREATE TABLE IF NOT EXISTS products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    category TEXT NOT NULL,
+    thumbnail TEXT,
+    description TEXT,
+    ingredients TEXT,
+    weight TEXT,
+    volume TEXT,
+    cookingTime TEXT,
+    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+  )`);
+
+  // Таблица заказов
+  db.run(`CREATE TABLE IF NOT EXISTS orders (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    orderNumber TEXT UNIQUE NOT NULL,
+    userId INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    status TEXT DEFAULT 'processing',
+    total INTEGER NOT NULL,
+    items TEXT NOT NULL,
+    pickupPoint TEXT,
+    deliveryData TEXT,
+    userPhone TEXT NOT NULL,
+    date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (userId) REFERENCES users (id)
+  )`);
+
+  // Тестовые данные продуктов
+  const products = [
+    {
+      name: 'Том Ям',
+      price: 290,
+      category: 'супы',
+      thumbnail: "https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg",
+      description: "Острый и ароматный тайский суп с креветками, грибами и кокосовым молоком. Подается с рисом.",
+      ingredients: "креветки,шампиньоны,кокосовое молоко,лемонграсс,лайм,чили",
+      weight: "350г",
+      cookingTime: "15-20 мин"
+    },
+    {
+      name: 'Пад Тай',
+      price: 320,
+      category: 'горячее',
+      thumbnail: "https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg",
+      description: "Традиционная тайская лапша с креветками, тофу, яйцом и арахисом.",
+      ingredients: "рисовая лапша,креветки,тофу,яйцо,ростки бобов,арахис",
+      weight: "300г",
+      cookingTime: "12-15 мин"
+    },
+    {
+      name: 'Том Кха',
+      price: 310,
+      category: 'супы',
+      thumbnail: "https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg",
+      description: "Кремовый суп с курицей и кокосовым молоком, с яркими нотами лемонграсса и лайма.",
+      ingredients: "куриное филе,кокосовое молоко,шампиньоны,лемонграсс,лайм,чили",
+      weight: "350г",
+      cookingTime: "15-20 мин"
+    },
+    {
+      name: 'Зеленое карри',
+      price: 350,
+      category: 'горячее',
+      thumbnail: "https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg",
+      description: "Ароматное карри с курицей и овощами в кокосовом молоке с зеленой пастой карри.",
+      ingredients: "куриное филе,кокосовое молоко,баклажан,базилик,зеленая паста карри",
+      weight: "320г",
+      cookingTime: "20-25 мин"
+    },
+    {
+      name: 'Спринг Роллы',
+      price: 280,
+      category: 'закуски',
+      thumbnail: "https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg",
+      description: "Хрустящие рисовые роллы с овощами и стеклянной лапшой. Подаются с соусом.",
+      ingredients: "рисовые блинчики,морковь,огурец,салат,стеклянная лапша,мята",
+      weight: "200г (4 шт)",
+      cookingTime: "8-10 мин"
+    },
+    {
+      name: 'Тайский чай',
+      price: 180,
+      category: 'напитки',
+      thumbnail: "https://cs13.pikabu.ru/post_img/big/2023/03/20/9/1679327108295817795.jpg",
+      description: "Традиционный тайский чай с молоком и специями. Освежающий и бодрящий напиток.",
+      ingredients: "тайский чай,сгущенное молоко,специи,лед",
+      volume: "400мл"
+    }
+  ];
+
+  const stmt = db.prepare(`INSERT INTO products (name, price, category, thumbnail, description, ingredients, weight, volume, cookingTime)
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+
+  products.forEach(product => {
+    stmt.run([
+      product.name,
+      product.price,
+      product.category,
+      product.thumbnail,
+      product.description,
+      product.ingredients,
+      product.weight,
+      product.volume,
+      product.cookingTime
+    ]);
+  });
+
+  stmt.finalize();
+
+  console.log('База данных инициализирована успешно!');
+});
+
+db.close();
+```
+
+### 3. src/services/database.js
+```javascript
+const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
+
+class DatabaseService {
+  constructor() {
+    this.dbPath = path.join(process.cwd(), 'foodies.db');
+    this.db = null;
+    this.init();
+  }
+
+  init() {
+    this.db = new sqlite3.Database(this.dbPath, (err) => {
+      if (err) {
+        console.error('Ошибка подключения к базе данных:', err);
+      } else {
+        console.log('Подключение к SQLite установлено');
+      }
+    });
+  }
+
+  // Пользователи
+  async getUserById(id) {
+    return new Promise((resolve, reject) => {
+      this.db.get('SELECT * FROM users WHERE id = ?', [id], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  }
+
+  async getUserByPhone(phone) {
+    return new Promise((resolve, reject) => {
+      this.db.get('SELECT * FROM users WHERE phone = ?', [phone], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  }
+
+  async createUser(userData) {
+    return new Promise((resolve, reject) => {
+      const { phone, name = 'Новый пользователь', email = '', address = '' } = userData;
+      this.db.run(
+        'INSERT INTO users (phone, name, email, address) VALUES (?, ?, ?, ?)',
+        [phone, name, email, address],
+        function(err) {
+          if (err) reject(err);
+          else resolve({ id: this.lastID, phone, name, email, address });
+        }
+      );
+    });
+  }
+
+  async updateUser(id, userData) {
+    return new Promise((resolve, reject) => {
+      const { name, email, address } = userData;
+      this.db.run(
+        'UPDATE users SET name = ?, email = ?, address = ?, updatedAt = CURRENT_TIMESTAMP WHERE id = ?',
+        [name, email, address, id],
+        function(err) {
+          if (err) reject(err);
+          else resolve({ id, ...userData });
+        }
+      );
+    });
+  }
+
+  // Продукты
+  async getAllProducts() {
+    return new Promise((resolve, reject) => {
+      this.db.all('SELECT * FROM products', (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  }
+
+  async getProductsByCategory(category) {
+    return new Promise((resolve, reject) => {
+      this.db.all('SELECT * FROM products WHERE category = ?', [category], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  }
+
+  async searchProducts(query) {
+    return new Promise((resolve, reject) => {
+      this.db.all('SELECT * FROM products WHERE name LIKE ?', [`%${query}%`], (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  }
+
+  // Заказы
+  async createOrder(orderData) {
+    return new Promise((resolve, reject) => {
+      const {
+        orderNumber,
+        userId,
+        type,
+        total,
+        items,
+        pickupPoint,
+        deliveryData,
+        userPhone
+      } = orderData;
+
+      this.db.run(
+        `INSERT INTO orders (orderNumber, userId, type, total, items, pickupPoint, deliveryData, userPhone)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          orderNumber,
+          userId,
+          type,
+          total,
+          JSON.stringify(items),
+          pickupPoint ? JSON.stringify(pickupPoint) : null,
+          deliveryData ? JSON.stringify(deliveryData) : null,
+          userPhone
+        ],
+        function(err) {
+          if (err) reject(err);
+          else resolve({
+            id: this.lastID,
+            ...orderData,
+            status: 'processing',
+            date: new Date().toISOString()
+          });
+        }
+      );
+    });
+  }
+
+  async getOrdersByUserId(userId) {
+    return new Promise((resolve, reject) => {
+      this.db.all('SELECT * FROM orders WHERE userId = ? ORDER BY date DESC', [userId], (err, rows) => {
+        if (err) reject(err);
+        else {
+          const orders = rows.map(row => ({
+            ...row,
+            items: JSON.parse(row.items),
+            pickupPoint: row.pickupPoint ? JSON.parse(row.pickupPoint) : null,
+            deliveryData: row.deliveryData ? JSON.parse(row.deliveryData) : null
+          }));
+          resolve(orders);
+        }
+      });
+    });
+  }
+
+  async updateOrderStatus(orderId, status) {
+    return new Promise((resolve, reject) => {
+      this.db.run(
+        'UPDATE orders SET status = ? WHERE id = ?',
+        [status, orderId],
+        function(err) {
+          if (err) reject(err);
+          else resolve({ id: orderId, status });
+        }
+      );
+    });
+  }
+
+  close() {
+    if (this.db) {
+      this.db.close();
+    }
+  }
+}
+
+module.exports = new DatabaseService();
+```
+
+### 4. src/services/api.js
+```javascript
+const API_BASE = 'http://localhost:3001/api';
+
+export const api = {
+  // Продукты
+  async getProducts() {
+    const response = await fetch(`${API_BASE}/products`);
+    return response.json();
+  },
+
+  async getProductsByCategory(category) {
+    const response = await fetch(`${API_BASE}/products/category/${category}`);
+    return response.json();
+  },
+
+  async searchProducts(query) {
+    const response = await fetch(`${API_BASE}/products/search?q=${query}`);
+    return response.json();
+  },
+
+  // Пользователи
+  async getUserById(id) {
+    const response = await fetch(`${API_BASE}/users/${id}`);
+    return response.json();
+  },
+
+  async createUser(userData) {
+    const response = await fetch(`${API_BASE}/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    return response.json();
+  },
+
+  async updateUser(id, userData) {
+    const response = await fetch(`${API_BASE}/users/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+    return response.json();
+  },
+
+  // Заказы
+  async createOrder(orderData) {
+    const response = await fetch(`${API_BASE}/orders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+    return response.json();
+  },
+
+  async getOrdersByUserId(userId) {
+    const response = await fetch(`${API_BASE}/orders/user/${userId}`);
+    return response.json();
+  },
+
+  async updateOrderStatus(orderId, status) {
+    const response = await fetch(`${API_BASE}/orders/${orderId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ status }),
+    });
+    return response.json();
+  },
+};
+```
+
+### 5. src/components/productList/ProductList.jsx
+```javascript
+import React, { useState, useEffect } from 'react';
+import ProductCard from './ProductCard';
+import ProductFilter from './ProductFilter';
+import ProductModal from '../ui/ProductModal';
+import { api } from '../../services/api';
+import styles from './productList.module.scss';
+
+const ProductList = ({ onAddToCart, searchQuery }) => {
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('все');
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showProductModal, setShowProductModal] = useState(false);
+
+  const filters = ['все', 'супы', 'горячее', 'закуски', 'напитки'];
+
+  useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    let result = products;
+
+    if (searchQuery) {
+      result = result.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    if (activeFilter !== 'все') {
+      result = result.filter(product => product.category === activeFilter);
+    }
+
+    setFilteredProducts(result);
+  }, [products, searchQuery, activeFilter]);
+
+  const fetchProducts = async () => {
+    try {
+      const data = await api.getProducts();
+
+      const formattedProducts = data.map(product => ({
+        ...product,
+        ingredients: product.ingredients ? product.ingredients.split(',') : []
+      }));
+
+      setProducts(formattedProducts);
+      setFilteredProducts(formattedProducts);
+    } catch (err) {
+      console.error('Ошибка загрузки товаров:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setShowProductModal(true);
+  };
+
+  const handleAddToCartFromModal = (product, quantity) => {
+    onAddToCart(product, quantity);
+    setShowProductModal(false);
+  };
+
+  if (loading) return <div className={styles.loading}>Загрузка товаров...</div>;
+  if (error) return <div className={styles.error}>Ошибка: {error}</div>;
+
+  return (
+    <div className={styles.container}>
+      <ProductFilter
+        filters={filters}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
+
+      {filteredProducts.length === 0 ? (
+        <div className={styles.noProducts}>
+          <h3>Товары не найдены</h3>
+          <p>Попробуйте изменить поисковый запрос или выбрать другую категорию</p>
+        </div>
+      ) : (
+        <div className={styles.productsGrid}>
+          {filteredProducts.map(product => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onAddToCart={onAddToCart}
+              onProductClick={handleProductClick}
+            />
+          ))}
+        </div>
+      )}
+
+      {showProductModal && selectedProduct && (
+        <ProductModal
+          product={selectedProduct}
+          onClose={() => setShowProductModal(false)}
+          onAddToCart={handleAddToCartFromModal}
+        />
+      )}
+    </div>
+  );
+};
+
+export default ProductList;
+```
+
+## 🚀 ИНСТРУКЦИЯ ЗАПУСКА
+
+### 1. Установка SQLite на Linux
+```bash
+# Ubuntu/Debian
+sudo apt update && sudo apt install sqlite3
+
+# CentOS/RHEL/Fedora
+sudo yum install sqlite3
+# или
+sudo dnf install sqlite3
+
+# Проверка
+sqlite3 --version
+```
+
+### 2. Установка зависимостей
+```bash
+npm install sqlite3 express cors
+```
+
+### 3. Инициализация базы данных
+```bash
+node init-db.js
+```
+
+### 4. Запуск системы
+```bash
+# Терминал 1 - Backend сервер
+node server.js
+
+# Терминал 2 - Frontend приложение
+npm start
+```
+
+## 🔄 ИЗМЕНЕНИЯ ДЛЯ ПЕРЕНЕСЕНИЯ С MOCKAPI
+
+### Заменены endpoints:
+- `https://68d662abc2a1754b426a8851.mockapi.io/products` → `http://localhost:3001/api/products`
+- `https://68d662abc2a1754b426a8851.mockapi.io/users` → `http://localhost:3001/api/users`
+- `https://68d662abc2a1754b426a8851.mockapi.io/orders` → `http://localhost:3001/api/orders`
+
+### Основные преимущества локальной базы:
+- ✅ Полный контроль над данными
+- ✅ Высокая производительность
+- ✅ Автономная работа (не требует интернета)
+- ✅ Легкое резервное копирование
+- ✅ Простая миграция данных
+
+## 📊 ТЕСТОВЫЕ ДАННЫЕ
+
+В базе автоматически создаются 6 товаров:
+1. Том Ям (супы) - 290 руб
+2. Пад Тай (горячее) - 320 руб
+3. Том Кха (супы) - 310 руб
+4. Зеленое карри (горячее) - 350 руб
+5. Спринг Роллы (закуски) - 280 руб
+6. Тайский чай (напитки) - 180 руб
+
+Этот дамп содержит всю необходимую информацию для полного воссоздания проекта в следующем чате! 🎯

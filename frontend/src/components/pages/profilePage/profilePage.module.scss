@@ -1,0 +1,528 @@
+.profilePage {
+	min-height: 70vh;
+	background: #f8f9fa;
+	padding: 20px 0;
+
+	@media (max-width: 768px) {
+		padding: 15px 0;
+	}
+
+	@media (max-width: 480px) {
+		padding: 10px 0;
+	}
+}
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+
+	@media (max-width: 768px) {
+		padding: 0 15px;
+	}
+
+	@media (max-width: 480px) {
+		padding: 0 10px;
+	}
+}
+
+.title {
+	font-size: 32px;
+	font-weight: 700;
+	color: #333;
+	margin-bottom: 30px;
+	text-align: center;
+
+	@media (max-width: 768px) {
+		font-size: 28px;
+		margin-bottom: 20px;
+	}
+
+	@media (max-width: 480px) {
+		font-size: 24px;
+		margin-bottom: 15px;
+	}
+}
+
+.profileContent {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 40px;
+
+	@media (max-width: 1024px) {
+		gap: 30px;
+	}
+
+	@media (max-width: 768px) {
+		grid-template-columns: 1fr;
+		gap: 20px;
+	}
+}
+
+.profileInfo,
+.ordersHistory {
+	background: white;
+	padding: 30px;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+	@media (max-width: 1024px) {
+		padding: 25px;
+	}
+
+	@media (max-width: 768px) {
+		padding: 20px;
+	}
+
+	@media (max-width: 480px) {
+		padding: 15px;
+		border-radius: 8px;
+	}
+
+	h2 {
+		margin: 0 0 20px 0;
+		font-size: 24px;
+		color: #333;
+
+		@media (max-width: 768px) {
+			font-size: 20px;
+			margin-bottom: 15px;
+		}
+
+		@media (max-width: 480px) {
+			font-size: 18px;
+		}
+	}
+}
+
+// Стили для информации профиля
+.infoDisplay {
+	.infoItem {
+		display: flex;
+		flex-direction: column;
+		margin-bottom: 15px;
+		padding-bottom: 15px;
+		border-bottom: 1px solid #f0f0f0;
+
+		@media (max-width: 480px) {
+			margin-bottom: 12px;
+			padding-bottom: 12px;
+		}
+
+		strong {
+			color: #333;
+			margin-bottom: 5px;
+			font-size: 14px;
+
+			@media (max-width: 480px) {
+				font-size: 13px;
+			}
+		}
+
+		span {
+			color: #666;
+			font-size: 16px;
+
+			@media (max-width: 480px) {
+				font-size: 14px;
+			}
+		}
+
+		&:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+		}
+	}
+}
+
+.editBtn {
+	width: 100%;
+	padding: 12px 20px;
+	background: #ff6b35;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	font-size: 16px;
+	cursor: pointer;
+	margin-top: 20px;
+	transition: background-color 0.2s;
+
+	&:hover {
+		background: #e55a2b;
+	}
+
+	@media (max-width: 480px) {
+		padding: 10px 15px;
+		font-size: 14px;
+		margin-top: 15px;
+	}
+}
+
+// Стили для формы редактирования
+.infoEdit {
+	.formGroup {
+		margin-bottom: 20px;
+
+		@media (max-width: 480px) {
+			margin-bottom: 15px;
+		}
+
+		label {
+			display: block;
+			margin-bottom: 8px;
+			font-weight: 600;
+			color: #333;
+			font-size: 14px;
+
+			@media (max-width: 480px) {
+				font-size: 13px;
+				margin-bottom: 6px;
+			}
+		}
+
+		input {
+			width: 100%;
+			padding: 12px;
+			border: 2px solid #e0e0e0;
+			border-radius: 6px;
+			font-size: 16px;
+			transition: border-color 0.2s;
+
+			&:focus {
+				outline: none;
+				border-color: #ff6b35;
+			}
+
+			@media (max-width: 480px) {
+				padding: 10px;
+				font-size: 14px;
+			}
+		}
+	}
+}
+
+.editActions {
+	display: flex;
+	gap: 10px;
+	margin-top: 25px;
+
+	@media (max-width: 480px) {
+		flex-direction: column;
+		gap: 8px;
+		margin-top: 20px;
+	}
+
+	button {
+		flex: 1;
+		padding: 12px 20px;
+		border: none;
+		border-radius: 6px;
+		cursor: pointer;
+		font-size: 16px;
+		transition: background-color 0.2s;
+
+		@media (max-width: 480px) {
+			padding: 10px 15px;
+			font-size: 14px;
+		}
+
+		&.saveBtn {
+			background: #28a745;
+			color: white;
+
+			&:hover {
+				background: #218838;
+			}
+		}
+
+		&.cancelBtn {
+			background: #6c757d;
+			color: white;
+
+			&:hover {
+				background: #545b62;
+			}
+		}
+	}
+}
+
+// Стили для истории заказов
+.noOrders {
+	text-align: center;
+	padding: 40px;
+	color: #666;
+
+	@media (max-width: 480px) {
+		padding: 30px 20px;
+	}
+
+	p {
+		margin: 0;
+		font-size: 16px;
+
+		@media (max-width: 480px) {
+			font-size: 14px;
+		}
+	}
+}
+
+.ordersList {
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+
+	@media (max-width: 480px) {
+		gap: 15px;
+	}
+}
+
+.orderItem {
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 20px;
+	background: #fafafa;
+
+	@media (max-width: 480px) {
+		padding: 15px;
+		border-radius: 6px;
+	}
+
+	&:hover {
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	}
+}
+
+.orderHeader {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 15px;
+	gap: 15px;
+
+	@media (max-width: 768px) {
+		flex-direction: column;
+		gap: 10px;
+	}
+}
+
+.orderInfo {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	flex: 1;
+}
+
+.orderNumber {
+	font-weight: 600;
+	color: #333;
+	font-size: 16px;
+
+	@media (max-width: 480px) {
+		font-size: 15px;
+	}
+}
+
+.orderDate {
+	color: #666;
+	font-size: 14px;
+
+	@media (max-width: 480px) {
+		font-size: 13px;
+	}
+}
+
+.orderTime {
+	color: #888;
+	font-size: 13px;
+	font-style: italic;
+
+	@media (max-width: 480px) {
+		font-size: 12px;
+	}
+}
+
+.orderStatus {
+	padding: 6px 12px;
+	border-radius: 20px;
+	font-size: 12px;
+	font-weight: 600;
+	text-align: center;
+	min-width: 100px;
+	white-space: nowrap;
+
+	@media (max-width: 480px) {
+		padding: 4px 8px;
+		font-size: 11px;
+		min-width: 80px;
+	}
+}
+
+// Стили для прогресс-бара
+.progressContainer {
+	margin: 15px 0;
+	padding: 15px;
+	background: #f8f9fa;
+	border-radius: 8px;
+
+	@media (max-width: 480px) {
+		padding: 12px;
+		margin: 12px 0;
+	}
+}
+
+.progressBar {
+	width: 100%;
+	height: 8px;
+	background: #e0e0e0;
+	border-radius: 4px;
+	overflow: hidden;
+	margin-bottom: 10px;
+}
+
+.progressFill {
+	height: 100%;
+	background: linear-gradient(90deg, #ff6b35, #ff8e53);
+	transition: width 0.5s ease;
+	border-radius: 4px;
+}
+
+.progressSteps {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 8px;
+	font-size: 11px;
+	text-align: center;
+	margin-bottom: 8px;
+
+	@media (max-width: 480px) {
+		font-size: 10px;
+		gap: 5px;
+	}
+
+	span {
+		color: #999;
+		transition: color 0.3s ease;
+		font-weight: 500;
+
+		&.active {
+			color: #ff6b35;
+			font-weight: 600;
+		}
+	}
+}
+
+.progressText {
+	text-align: center;
+	font-size: 12px;
+	color: #666;
+	font-weight: 500;
+
+	@media (max-width: 480px) {
+		font-size: 11px;
+	}
+}
+
+// Стили для деталей заказа
+.orderDetails {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.orderRow {
+	display: flex;
+	gap: 10px;
+
+	@media (max-width: 480px) {
+		flex-direction: column;
+		gap: 5px;
+	}
+}
+
+.orderLabel {
+	font-weight: 600;
+	color: #333;
+	min-width: 80px;
+	font-size: 14px;
+
+	@media (max-width: 480px) {
+		font-size: 13px;
+		min-width: auto;
+	}
+}
+
+.orderValue {
+	color: #666;
+	flex: 1;
+	font-size: 14px;
+
+	@media (max-width: 480px) {
+		font-size: 13px;
+	}
+}
+
+.orderProduct {
+	display: inline-block;
+	margin-right: 5px;
+}
+
+.comment,
+.workingHours {
+	font-style: italic;
+	color: #888;
+	margin-top: 4px;
+	font-size: 13px;
+
+	@media (max-width: 480px) {
+		font-size: 12px;
+	}
+}
+
+// Стили для состояний
+.loading {
+	text-align: center;
+	padding: 60px 20px;
+	font-size: 18px;
+	color: #666;
+
+	@media (max-width: 480px) {
+		padding: 40px 15px;
+		font-size: 16px;
+	}
+}
+
+.errorMessage {
+	text-align: center;
+	padding: 60px 20px;
+	color: #dc3545;
+	font-size: 16px;
+
+	@media (max-width: 480px) {
+		padding: 40px 15px;
+		font-size: 14px;
+	}
+}
+
+// Дополнительные медиа-запросы для очень маленьких экранов
+@media (max-width: 360px) {
+	.container {
+		padding: 0 8px;
+	}
+
+	.profileInfo,
+	.ordersHistory {
+		padding: 12px;
+	}
+
+	.title {
+		font-size: 22px;
+	}
+
+	.orderItem {
+		padding: 12px;
+	}
+
+	.progressContainer {
+		padding: 10px;
+	}
+}
