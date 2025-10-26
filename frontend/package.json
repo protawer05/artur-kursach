@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
+		"@pbe/react-yandex-maps": "^1.2.5",
 		"@testing-library/dom": "^10.4.1",
 		"@testing-library/jest-dom": "^6.8.0",
 		"@testing-library/react": "^16.3.0",
@@ -11,10 +12,13 @@
 		"react-dom": "^19.1.1",
 		"react-router-dom": "^7.9.1",
 		"react-scripts": "5.0.1",
+		"react-yandex-map": "^4.6.0",
+		"react-yandex-maps": "^4.6.0",
 		"sass": "^1.92.1",
 		"scss": "^0.2.4",
 		"sqlite3": "^5.1.7",
-		"web-vitals": "^2.1.4"
+		"web-vitals": "^2.1.4",
+		"ymap3-components": "^1.2.3"
 	},
 	"scripts": {
 		"start": "react-scripts start",

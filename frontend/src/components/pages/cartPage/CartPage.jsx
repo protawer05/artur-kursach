@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import PickupModal from './PickupModal'
-import DeliveryModal from './DeliveryModal'
+import MapModal from '../../mapModal/MapModal'
 import Notification from './Notification'
 import { orderAPI } from '../../../services/api'
 import s from './cartPage.module.scss'
@@ -13,9 +12,8 @@ const CartPage = ({
 	onClearCart,
 	currentUser,
 }) => {
-	const [showPickupModal, setShowPickupModal] = useState(false)
-	const [showDeliveryModal, setShowDeliveryModal] = useState(false)
-	const [selectedPickupPoint, setSelectedPickupPoint] = useState(null)
+	const [showMapModal, setShowMapModal] = useState(false) // ОДНО МОДАЛЬНОЕ ОКНО
+	const [orderType, setOrderType] = useState(null) // 'pickup' или 'delivery'
 	const [notification, setNotification] = useState({
 		show: false,
 		message: '',
@@ -27,58 +25,6 @@ const CartPage = ({
 		0
 	)
 	const total = subtotal
-
-	const pickupPoints = [
-		{
-			id: 1,
-			name: 'РЦ НЛО',
-			address: 'ул. Якуба Коляса, 37',
-			hours: 'Круглосуточно',
-			deliveryTime: 'Суши - 15 мин, WOK - 15 мин',
-		},
-		{
-			id: 2,
-			name: 'Машерова',
-			address: 'пр-т. Машерова, 78',
-			hours: '10:00 - 23:00',
-			deliveryTime: 'Суши - 15 мин, WOK - 15 мин',
-		},
-		{
-			id: 3,
-			name: 'ТЦ Глобо',
-			address: 'ул. Уманская, 54',
-			hours: '10:00 - 23:00',
-			deliveryTime: 'Суши - 15 мин, WOK - 15 мин',
-		},
-		{
-			id: 4,
-			name: 'ТЦ Моио',
-			address: 'пр. Партизанская, 150а',
-			hours: '10:00 - 23:00',
-			deliveryTime: 'Суши - 15 мин, WOK - 15 мин',
-		},
-		{
-			id: 5,
-			name: 'Притыцкого',
-			address: 'ул. Притыцкого, 83',
-			hours: '10:00 - 23:00',
-			deliveryTime: 'Суши - 15 мин, WOK - 15 мин',
-		},
-		{
-			id: 6,
-			name: 'Налибокская',
-			address: 'ул. Налибокская, 1',
-			hours: '10:00 - 23:00',
-			deliveryTime: 'Суши - 15 мин, WOK - 15 мин',
-		},
-		{
-			id: 7,
-			name: 'Шафарнянская',
-			address: 'ул. Шафарнянская, 11',
-			hours: '10:00 - 23:00',
-			deliveryTime: 'Суши - 15 мин, WOK - 15 мин',
-		},
-	]
 
 	const showNotification = (message, type = 'success') => {
 		setNotification({ show: true, message, type })
@@ -98,43 +44,20 @@ const CartPage = ({
 				return
 			}
 
-			console.log('Current user for order:', currentUser)
-
-			// FALLBACK для телефона
-			let userPhone = currentUser.phone
-			if (!userPhone) {
-				const savedUser = JSON.parse(
-					localStorage.getItem('currentUser') || '{}'
-				)
-				userPhone = savedUser.phone
-				console.warn(
-					'Phone not found in currentUser, using from localStorage:',
-					userPhone
-				)
-			}
-
-			if (!userPhone) {
-				showNotification('Ошибка: номер телефона не найден', 'error')
-				return
-			}
-
 			const orderData = {
 				type: 'pickup',
 				items: cartItems,
 				pickupPoint: {
 					name: pickupPoint.name,
 					address: pickupPoint.address,
+					workingHours: pickupPoint.workingHours,
 				},
 				total,
 				userId: parseInt(currentUser.id),
-				userPhone: userPhone,
+				userPhone: currentUser.phone,
 				orderNumber: `ORD-${Date.now()}`,
-				// НЕ ПЕРЕДАВАЙТЕ DATE - база данных сама установит CURRENT_TIMESTAMP
 			}
 
-			console.log('Order data:', orderData)
-
-			// Используем ваш API для создания заказа
 			await orderAPI.createOrder(orderData)
 
 			showNotification(
@@ -142,6 +65,7 @@ const CartPage = ({
 				'success'
 			)
 			onClearCart()
+			setShowMapModal(false)
 		} catch (error) {
 			console.error('Ошибка при оформлении заказа:', error)
 			showNotification(
@@ -149,8 +73,6 @@ const CartPage = ({
 				'error'
 			)
 		}
-
-		setShowPickupModal(false)
 	}
 
 	const handleDeliveryOrder = async deliveryData => {
@@ -163,27 +85,20 @@ const CartPage = ({
 				return
 			}
 
-			console.log('Current user for delivery order:', currentUser)
-
 			const orderData = {
 				type: 'delivery',
 				items: cartItems,
 				deliveryData: {
-					street: deliveryData.street,
-					house: deliveryData.house,
-					entrance: deliveryData.entrance,
-					apartment: deliveryData.apartment,
+					address: deliveryData.address,
+					comment: deliveryData.comment,
 					phone: deliveryData.phone,
 				},
 				total,
-				userId: parseInt(currentUser.id), // ПРЕОБРАЗУЕМ В ЧИСЛО
-				userPhone: currentUser.phone, // ДОБАВЛЯЕМ ТЕЛЕФОН
+				userId: parseInt(currentUser.id),
+				userPhone: currentUser.phone,
 				orderNumber: `ORD-${Date.now()}`,
 			}
 
-			console.log('Delivery order data with phone:', orderData)
-
-			// Используем ваш API для создания заказа
 			await orderAPI.createOrder(orderData)
 
 			showNotification(
@@ -191,6 +106,7 @@ const CartPage = ({
 				'success'
 			)
 			onClearCart()
+			setShowMapModal(false)
 		} catch (error) {
 			console.error('Ошибка при оформлении заказа:', error)
 			showNotification(
@@ -198,8 +114,11 @@ const CartPage = ({
 				'error'
 			)
 		}
+	}
 
-		setShowDeliveryModal(false)
+	const handleOrderClick = type => {
+		setOrderType(type)
+		setShowMapModal(true)
 	}
 
 	return (
@@ -285,14 +204,14 @@ const CartPage = ({
 							<div className={s.orderButtons}>
 								<button
 									className={s.pickupBtn}
-									onClick={() => setShowPickupModal(true)}
+									onClick={() => handleOrderClick('pickup')}
 									disabled={!currentUser}
 								>
 									Самовывоз
 								</button>
 								<button
 									className={s.deliveryBtn}
-									onClick={() => setShowDeliveryModal(true)}
+									onClick={() => handleOrderClick('delivery')}
 									disabled={!currentUser}
 								>
 									Доставка
@@ -306,20 +225,15 @@ const CartPage = ({
 					</div>
 				)}
 
-				{showPickupModal && (
-					<PickupModal
-						pickupPoints={pickupPoints}
-						selectedPoint={selectedPickupPoint}
-						onSelectPoint={setSelectedPickupPoint}
-						onOrder={handlePickupOrder}
-						onClose={() => setShowPickupModal(false)}
-					/>
-				)}
-
-				{showDeliveryModal && (
-					<DeliveryModal
-						onOrder={handleDeliveryOrder}
-						onClose={() => setShowDeliveryModal(false)}
+				{/* ОДНО МОДАЛЬНОЕ ОКНО ДЛЯ ВСЕХ ТИПОВ ЗАКАЗА */}
+				{showMapModal && (
+					<MapModal
+						type={orderType}
+						onClose={() => setShowMapModal(false)}
+						onOrder={
+							orderType === 'pickup' ? handlePickupOrder : handleDeliveryOrder
+						}
+						currentUser={currentUser}
 					/>
 				)}
 
