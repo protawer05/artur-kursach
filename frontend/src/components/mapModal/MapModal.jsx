@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import {
 	YMaps,
 	Map,
@@ -18,7 +18,6 @@ const MapModal = ({ onClose, onOrder, type, currentUser }) => {
 	})
 	const [deliveryCoords, setDeliveryCoords] = useState(null)
 
-	// Пункты самовывоза
 	// Пункты самовывоза
 	const pickupPoints = [
 		{
@@ -56,40 +55,35 @@ const MapModal = ({ onClose, onOrder, type, currentUser }) => {
 			coords: [54.8156, 56.0679],
 			hours: '10:00 - 22:00',
 		},
-		{
-			id: 6,
-			name: 'ТЦ ЦЕНТР',
-			address: 'ул. Цюрупы, 97',
-			coords: [54.7318, 55.9573],
-			hours: '10:00 - 21:00',
-		},
-		{
-			id: 7,
-			name: 'ТЦ ЮЖНЫЙ ПОЛЮС',
-			address: 'ул. Комарова, 5',
-			coords: [54.6987, 55.9821],
-			hours: '09:00 - 22:00',
-		},
-		{
-			id: 8,
-			name: 'ТЦ МЕГА',
-			address: 'ул. Рубежная, 174',
-			coords: [54.8172, 56.0701],
-			hours: '10:00 - 23:00',
-		},
 	]
 
 	// Обработчик клика по карте для доставки
-	const handleMapClick = e => {
+	const handleMapClick = async e => {
 		if (type !== 'delivery') return
 
 		const coords = e.get('coords')
 		setDeliveryCoords(coords)
+		setSelectedAddress('Определяем адрес...')
 
-		// Геокодирование координат в адрес
-		geocodeCoordinates(coords).then(address => {
-			setSelectedAddress(address)
-		})
+		// Используем прямое обращение к геокодеру API
+		try {
+			const response = await fetch(
+				`https://geocode-maps.yandex.ru/v1/?apikey=7f70e535-61db-467e-ac09-3a2712982a31&geocode=${coords[1]},${coords[0]}&format=json`
+			)
+
+			const data = await response.json()
+
+			if (data.response.GeoObjectCollection.featureMember.length > 0) {
+				const address =
+					data.response.GeoObjectCollection.featureMember[0].GeoObject.name
+				setSelectedAddress(address)
+			} else {
+				setSelectedAddress('Адрес не определен')
+			}
+		} catch (error) {
+			console.error('Ошибка геокодирования:', error)
+			setSelectedAddress('Ошибка определения адреса')
+		}
 	}
 
 	// Обработчик клика по пункту самовывоза
@@ -104,26 +98,8 @@ const MapModal = ({ onClose, onOrder, type, currentUser }) => {
 		})
 	}
 
-	const geocodeCoordinates = async coords => {
-		return new Promise(resolve => {
-			// Используем встроенный геокодер Яндекс Карт
-			window.ymaps
-				.geocode(coords)
-				.then(res => {
-					const firstGeoObject = res.geoObjects.get(0)
-					const address = firstGeoObject
-						? firstGeoObject.getAddressLine()
-						: 'Адрес не определен'
-					resolve(address)
-				})
-				.catch(() => {
-					resolve('Адрес не определен')
-				})
-		})
-	}
-
 	const handleOrder = () => {
-		if (!selectedAddress) {
+		if (!selectedAddress || selectedAddress === 'Определяем адрес...') {
 			alert('Пожалуйста, выберите адрес или пункт выдачи')
 			return
 		}
@@ -144,9 +120,6 @@ const MapModal = ({ onClose, onOrder, type, currentUser }) => {
 			})
 		}
 	}
-
-	// Модули для карты
-	const mapModules = ['geocode', 'geolocation', 'placemark']
 
 	return (
 		<div className={styles.modalOverlay} onClick={onClose}>
@@ -174,7 +147,7 @@ const MapModal = ({ onClose, onOrder, type, currentUser }) => {
 							width='100%'
 							height='400px'
 							onClick={handleMapClick}
-							modules={mapModules}
+							modules={['geolocation', 'placemark']}
 						>
 							{/* Контролы на карте */}
 							<GeolocationControl options={{ float: 'left' }} />
@@ -188,7 +161,7 @@ const MapModal = ({ onClose, onOrder, type, currentUser }) => {
 										geometry={point.coords}
 										properties={{
 											balloonContent: `
-                      <div class="${styles.balloonContent}">
+                      <div>
                         <h3>${point.name}</h3>
                         <p>${point.address}</p>
                         <p><strong>Часы работы:</strong> ${point.hours}</p>
@@ -211,7 +184,7 @@ const MapModal = ({ onClose, onOrder, type, currentUser }) => {
 									geometry={deliveryCoords}
 									properties={{
 										balloonContent: `
-                      <div class="${styles.balloonContent}">
+                      <div>
                         <h3>Адрес доставки</h3>
                         <p>${selectedAddress}</p>
                         ${
@@ -270,7 +243,9 @@ const MapModal = ({ onClose, onOrder, type, currentUser }) => {
 					<button
 						className={styles.orderBtn}
 						onClick={handleOrder}
-						disabled={!selectedAddress}
+						disabled={
+							!selectedAddress || selectedAddress === 'Определяем адрес...'
+						}
 					>
 						{type === 'pickup' ? 'Забрать отсюда' : 'Заказать доставку'}
 					</button>
